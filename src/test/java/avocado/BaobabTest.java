@@ -90,7 +90,15 @@ public class BaobabTest extends RestAssuredTest {
                 .statusCode(OK.value());
     }
 
-
+    @Test
+    public void getTanksInfo_givenUserWithRoleGeneral_ThenShouldGetResult() {
+        givenRequestForUser("GENNY", "RALLY")
+                .when()
+                .get(String.format("%s/%s", ArmyResource.ARMY_RESOURCE_PATH, "tanks"))
+                .then()
+                .assertThat()
+                .statusCode(OK.value());
+    }
 
 
     @Test
