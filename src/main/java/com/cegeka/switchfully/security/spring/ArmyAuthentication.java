@@ -1,9 +1,11 @@
 package com.cegeka.switchfully.security.spring;
 
+import com.cegeka.switchfully.security.external.authentication.Feature;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,7 +21,9 @@ public class ArmyAuthentication implements Authentication {
 
     public ArmyAuthentication(String username, String credentials, List<String> roles) {
         this.username = username;
-        this.roles = roles.stream()
+        this.roles = forRoles(roles)
+                .stream()
+                .map(Enum::name)
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
         this.credentials = credentials;
@@ -65,5 +69,11 @@ public class ArmyAuthentication implements Authentication {
     @Override
     public String getName() {
         return username;
+    }
+
+    private List<Feature> forRoles(List<String> roles) {
+        return Arrays.stream(Feature.values())
+                .filter(feature -> feature.hasOneOfRoles(roles))
+                .collect(Collectors.toList());
     }
 }
