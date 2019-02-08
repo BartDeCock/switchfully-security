@@ -5,10 +5,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class CriminalRecordService {
 
-    public CriminalRecord hasCriminalRecord(String username){
+    private CriminalRecord getCriminalRecord(String username){
         if(username.equals("MOB") || username.equals("CRIMI")){
             return CriminalRecord.recordForCriminal();
         }
         return CriminalRecord.cleanRecord();
+    }
+    public boolean hasNoCriminalRecord(String username){
+        return getCriminalRecord(username).getOffenses().isEmpty();
     }
 }

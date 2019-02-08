@@ -1,5 +1,6 @@
 package com.cegeka.switchfully.security.spring;
 
+import com.cegeka.switchfully.security.external.criminalrecord.CriminalRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -22,6 +23,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private AuthenticationEntryPoint authEntryPoint;
     @Autowired
     private ArmyAuthenticationProvider armyAuthenticationProvider;
+    @Autowired
+    private CriminalRecordService criminalRecordService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -31,7 +34,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //advantage: able to secure multiple, similar url's at the same time
                 //disadvantage: this code is completely decoupled from the Rest-controller code. This makes it easy to forget to adjust it when e.g. adding a new rest-call
 //                .antMatchers("/army").hasRole("CIVILIAN")
-//                .antMatchers("/army/promote/**").hasRole("HUMAN_RELATIONSHIPS")
 //                .antMatchers("/army/discharge/**").hasRole("HUMAN_RELATIONSHIPS")
 //                .antMatchers("/army/nuke").hasRole("GENERAL")
 //                .antMatchers("/army/**").hasAnyRole("PRIVATE", "GENERAL")
@@ -39,6 +41,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().httpBasic()
                 .authenticationEntryPoint(authEntryPoint);
+        http.authorizeRequests()
+                .antMatchers("/armies/promote/{name}").access("@criminalRecordService.hasNoCriminalRecord(#name)");
     }
 
     @Autowired
